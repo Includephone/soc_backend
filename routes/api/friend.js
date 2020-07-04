@@ -109,6 +109,21 @@ router.put('/edit', (req, res)=>{
             })
         });
     }
-})
+});
+
+router.post('/list', (req, res)=>{
+    Friend.find({
+        $or:[
+            {'user1': req.body.id},
+            {'user2': req.body.id}
+        ]
+    }).select('status user1 user2')
+    .populate('user1 user2', '_id name')
+    .then((result)=>{
+        res.json({
+            result:result
+        })
+    }).catch(err=>console.log(err))
+});
 
 module.exports = router;

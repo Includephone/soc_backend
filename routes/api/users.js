@@ -85,7 +85,10 @@ router.post('/login', (req, res)=>{
 
 router.post('/find', (req, res)=>{
     console.log(req.body.search);
-    User.find({name: {'$regex': `${req.body.search}`, '$options': 'i'}}).then((result)=>{
+    User.find({name: {'$regex': `${req.body.search}`, '$options': 'i'}})
+    .select('_id, name')
+    .then((result)=>{
+        console.log(result);
         res.json({
             result: result
         });

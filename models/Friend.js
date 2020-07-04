@@ -3,11 +3,13 @@ const Schema = mongoose.Schema;
 
 const FriendSchema = new Schema({
     user1: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
         required: true
     },
     user2: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
         required: true
     },
     status: {
