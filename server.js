@@ -6,6 +6,7 @@ const cors = require('cors');
 
 const users = require('./routes/api/users');
 const friends = require('./routes/api/friend');
+const messages = require('./routes/api/message');
 
 const app = express();
 
@@ -34,6 +35,7 @@ require("./config/passport")(passport);
 //routes
 app.use('/api/users', users);
 app.use('/api/friends', friends);
+app.use('/api/messages', messages);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server up and running on port ${port} !`));
