@@ -5,9 +5,9 @@ const MessageSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    conservation: {
+    dialog: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'conservations',
+        ref: 'dialogs',
         required: true
     },
     sender: {

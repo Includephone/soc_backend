@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const Message = require('../../models/Message');
-const Conservation = require('../../models/Conservation');
+const Dialog = require('../../models/Dialog');
 const { distinct } = require('../../models/Message');
 
 router.post('/newmessage', (req, res)=>{
-    Conservation.findOne({
+    Dialog.findOne({
         $or: [
             {
                 user1: req.body.user1,
@@ -17,11 +17,11 @@ router.post('/newmessage', (req, res)=>{
                 user2: req.body.user1
             }
         ]
-    }).then((conserv)=>{
-        if(conserv){
+    }).then((dialog)=>{
+        if(dialog){
             const newMessage = new Message({
                 message: req.body.text,
-                conservation: conserv._id,
+                dialog: dialog._id,
                 sender: req.body.user1
             });
             newMessage.save();
@@ -29,15 +29,15 @@ router.post('/newmessage', (req, res)=>{
                 result: newMessage
             })
         } else {
-            const newConservation = new Conservation({
+            const newDialog = new Dialog({
                 user1: req.body.user1,
                 user2: req.body.user2
             });
-            newConservation.save()
-            .then((newconserv)=>{
+            newDialog.save()
+            .then((newdialog)=>{
                 const newMessage = new Message({
                     message: req.body.text,
-                    conservation: newconserv._id,
+                    dialog: newdialog._id,
                     sender: req.body.user1
                 });
                 newMessage.save();
@@ -53,7 +53,7 @@ router.post('/newmessage', (req, res)=>{
 
 router.post('/list', (req, res)=>{
 
-    Conservation.find({
+    Dialog.find({
         $or:[
             {user1: req.body.user},
             {user2: req.body.user}
@@ -61,20 +61,20 @@ router.post('/list', (req, res)=>{
     })
     .sort({updateAt: -1})
     .limit(10)
-    .then((conserv)=>{
+    .then((dialog)=>{
         let idArray = []
-        conserv.map((item)=>{
+        dialog.map((item)=>{
             idArray.push(item._id);
         });
         Message.aggregate([
             {$match: {
-                'conservation' : {$in: idArray}}
+                'dialog' : {$in: idArray}}
             },
             {$group:{
-                _id: '$conservation',
+                _id: '$dialog',
                 'read': {'$last': '$read'},
                 'message': {'$last': '$message'},
-                'conservation': {'$last': '$conservation'},
+                'dialog': {'$last': '$dialog'},
                 'sender' : {'$last': '$sender'},
                 'createdAt': {'$last': '$createdAt'},
                 'messageId': {'$last': '$_id'}
@@ -87,47 +87,47 @@ router.post('/list', (req, res)=>{
                 }
             },
             {$lookup:{
-                    from: 'conservations',
-                    localField: 'conservation',
+                    from: 'dialogs',
+                    localField: 'dialog',
                     foreignField: '_id',
-                    as: 'conservation'
+                    as: 'dialog'
                 }
             },
-            {$unwind: '$conservation'},
+            {$unwind: '$dialog'},
             {$lookup:{
                     from: 'users',
-                    localField: 'conservation.user1',
+                    localField: 'dialog.user1',
                     foreignField: '_id',
-                    as: 'conservation.user1'
+                    as: 'dialog.user1'
                 }
             },
             {$lookup:{
                     from: 'users',
-                    localField: 'conservation.user2',
+                    localField: 'dialog.user2',
                     foreignField: '_id',
-                    as: 'conservation.user2'
+                    as: 'dialog.user2'
                 }
             },
-            {$unwind: '$conservation.user1'},
-            {$unwind: '$conservation.user2'},
+            {$unwind: '$dialog.user1'},
+            {$unwind: '$dialog.user2'},
             {$unwind: '$sender'},
             {$project: {
-                'conservation.createdAt': 0,
-                'conservation.updatedAt': 0,
-                'conservation.__v': 0,
+                'dialog.createdAt': 0,
+                'dialog.updatedAt': 0,
+                'dialog.__v': 0,
                 'sender.email': 0,
                 'sender.password': 0,
                 'sender.date': 0,
                 'sender.date': 0,
                 'sender.__v': 0,
-                'conservation.user1.email': 0,
-                'conservation.user1.password': 0,
-                'conservation.user1.date': 0,
-                'conservation.user1.__v': 0,
-                'conservation.user2.email': 0,
-                'conservation.user2.password': 0,
-                'conservation.user2.date': 0,
-                'conservation.user2.__v': 0,
+                'dialog.user1.email': 0,
+                'dialog.user1.password': 0,
+                'dialog.user1.date': 0,
+                'dialog.user1.__v': 0,
+                'dialog.user2.email': 0,
+                'dialog.user2.password': 0,
+                'dialog.user2.date': 0,
+                'dialog.user2.__v': 0,
             }}
         ])
         .then((messages)=>{

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ConservationSchema = mongoose.Schema({
+const DialogSchema = mongoose.Schema({
         user1:{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',
@@ -16,4 +16,4 @@ const ConservationSchema = mongoose.Schema({
     timestamps: true
 })
 
-module.exports = Conservation = mongoose.model('conservations', ConservationSchema);
+module.exports = Dialog = mongoose.model('dialogs', DialogSchema);
